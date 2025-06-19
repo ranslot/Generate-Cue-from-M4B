@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
 // Helper: seconds → MM:SS:FF
 function secondsToCueTime(seconds) {
@@ -7,7 +7,9 @@ function secondsToCueTime(seconds) {
   const minutes = Math.floor(totalSeconds / 60);
   const secs = totalSeconds % 60;
   const frames = Math.floor((parseFloat(seconds) - totalSeconds) * 75);
-  return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}:${String(frames).padStart(2, '0')}`;
+  return `${String(minutes).padStart(2, "0")}:${
+    String(secs).padStart(2, "0")
+  }:${String(frames).padStart(2, "0")}`;
 }
 
 // Get base filename from CLI argument
@@ -24,11 +26,11 @@ if (!fs.existsSync(jsonFile)) {
 }
 
 // Parse chapters
-const chaptersData = JSON.parse(fs.readFileSync(jsonFile, 'utf-8'));
+const chaptersData = JSON.parse(fs.readFileSync(jsonFile, "utf-8"));
 const chapters = chaptersData.chapters;
 
 if (!chapters || chapters.length === 0) {
-  console.error('No chapters found in JSON.');
+  console.error("No chapters found in JSON.");
   process.exit(1);
 }
 
@@ -39,7 +41,7 @@ chapters.forEach((chapter, index) => {
   const title = chapter.tags?.title || `Chapter ${index + 1}`;
   const time = secondsToCueTime(chapter.start_time);
 
-  cueOutput += `  TRACK ${String(index + 1).padStart(2, '0')} AUDIO\n`;
+  cueOutput += `  TRACK ${String(index + 1).padStart(2, "0")} AUDIO\n`;
   cueOutput += `    TITLE "${title}"\n`;
   cueOutput += `    INDEX 01 ${time}\n`;
 });
