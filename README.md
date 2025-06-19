@@ -1,51 +1,72 @@
-## 🎧 Generate Cue from M4B
+# M4B to CUE Generater
 
-This tool lets you convert `.m4b` audiobook chapter bookmarks into `.cue` files using **m4b-tool** and Python.
-
----
-
-### 🔧 Features
-
-* Extracts chapter data from `.m4b` files using **m4b-tool**
-* Converts bookmarks to a standard `.cue` sheet
-* Works on Windows (Batch + Python)
-* Automatically names files based on the original `.m4b`
+Convert `.m4b` audiobook files with chapter metadata into `.cue` sheets using `ffprobe`, Node.js, and a batch script.
 
 ---
 
-### 📁 Files
+## 📦 Features
 
-* `generate_cue_from_m4b.bat` — Batch script that:
-
-  * Extracts chapter info using **m4b-tool**
-  * Calls the Python script to generate a `.cue` file
-* `m4b_tool_text_to_cue.py` — Python script that:
-
-  * Converts chapter JSON into `.cue` format
-* `m4b-tool.phar` — m4b-tool file to Extracts chapter info
----
-
-### 📦 Requirements
-
-* [m4b-tool](https://github.com/iwalton3/m4b-tool) — **must be in the same folder as the scripts**
-* [PHP](https://www.php.net/) with **zip** and **curl** extensions enabled
-* [Python 3.x](https://www.python.org/)
+- Extracts chapter metadata from `.m4b` using `ffprobe`
+- Converts chapter start times (including time_base correction) to standard CUE format
+- Automatically deletes temporary JSON files after processing
+- Easy-to-use batch script with support for drag-and-drop or command-line input
 
 ---
 
-### ▶️ How to Use
+## 🛠 Requirements
 
-1. Put your `.m4b` file and the `m4b-tool` executable in the same folder as the scripts
-
-2. **Drag and drop** the `.m4b` file onto `generate_cue.bat`
-   *or* run it via command line:
-
-   ```bash
-   generate_cue.bat yourbook.m4b
-   ```
-
-3. It will generate:
-
-   * `yourbook.cue` — cue sheet
+- [Node.js](https://nodejs.org/)
+- [ffmpeg](https://ffmpeg.org/) (must be accessible via command line)
+- Windows (for batch script execution)
 
 ---
+
+## 📁 Files
+
+- `generateCue.js` — Node.js script that generates a `.cue` file from JSON metadata.
+- `generate_cue.bat` — Batch script to run the entire process.
+- `README.md` — You're reading it!
+
+---
+
+## 🚀 Usage
+
+### 🖱 Option 1: Drag-and-Drop
+
+1. Drag your `.m4b` file onto `generate_cue.bat`.
+2. The script will:
+   - Run `ffprobe` to extract chapters
+   - Generate a `.cue` file via Node.js
+   - Delete the temporary `.json` file
+3. Your `.cue` file will appear next to your `.m4b`.
+
+### 💻 Option 2: Command Line
+
+```sh
+generate_cue.bat "MyAudiobook.m4b"
+```
+
+### 📋 Example Output
+For a file named MyBook.m4b, the following files are generated:
+
+MyBook.cue ✅ (Final output)
+
+MyBook.json ❌ (Deleted automatically after success)
+
+---
+
+## 🧠 Notes
+
+If an error occurs, the .json is kept for debugging.
+
+---
+
+## 🧪 Debugging
+If something goes wrong:
+
+Open a terminal and run the batch script manually to see error output.
+
+Check that ffprobe is installed and in your system PATH.
+
+Confirm your .m4b file has embedded chapters.
+
