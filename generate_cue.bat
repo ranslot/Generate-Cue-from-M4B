@@ -1,37 +1,49 @@
 @echo off
-setlocal
+setlocal enabledelayedexpansion
 
-set "inputFile=%~1"
-if "%inputFile%"=="" (
-    echo Usage: %~nx0 ^<audiobook.m4b^>
+if "%~1"=="" (
+    echo Usage: drag and drop .m4b files onto this script OR run:
+    echo.
+    echo     %~nx0 file1.m4b file2.m4b ...
+    echo.
     pause
     exit /b
 )
 
-set "baseName=%~n1"
-set "jsonFile=%baseName%.json"
-set "cueFile=%baseName%.cue"
+:: Loop through each input file
+for %%F in (%*) do (
+    set "inputFile=%%~fF"
+    set "baseName=%%~nF"
+    set "jsonFile=!baseName!.json"
+    set "cueFile=!baseName!.cue"
 
-echo Extracting chapters from "%inputFile%"...
-ffprobe -i "%inputFile%" -print_format json -show_chapters -loglevel error > "%jsonFile%"
+    echo ---------------------------------------
+    echo Processing: !inputFile!
+    echo Extracting chapters with ffprobe...
 
-if not exist "%jsonFile%" (
-    echo Failed to generate chapter JSON. Aborting.
-    pause
-    exit /b
+    ffprobe -i "!inputFile!" -print_format json -show_chapters -loglevel error > "!jsonFile!"
+
+    if not exist "!jsonFile!" (
+        echo [Error] Failed to generate chapter JSON for !inputFile!
+        echo Skipping...
+        echo.
+        continue
+    )
+
+    echo Running Node.js to generate cue file...
+    call node generate_cue.js "!baseName!"
+
+    if exist "!cueFile!" (
+        echo [OK] Success: !cueFile! created.
+        echo Cleaning up JSON...
+        del "!jsonFile!"
+    ) else (
+        echo [Error] Node script did not produce a cue file.
+        echo JSON retained for debugging: !jsonFile!
+    )
+    echo.
 )
 
-echo Running Node.js script to generate .cue file...
-call node generate_cue.js "%baseName%"
-
-:: Wait until cue file exists before cleanup
-if exist "%cueFile%" (
-    echo Deleting temporary JSON file...
-    del "%jsonFile%"
-    echo Done. CUE file created: %cueFile%
-) else (
-    echo Node script did not produce a .cue file. Keeping JSON for debug.
-)
-
+echo [OK] All files processed.
 pause
 endlocal
